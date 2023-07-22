@@ -52,5 +52,10 @@
     "vite": "^4.3.3",
     "vite-tsconfig-paths": "^4.2.0"
   },
+  "babelMacros": {
+    "twin": {
+      "preset": "emotion"
+    }
+  },
   "packageManager": "yarn@3.5.0"
 }
