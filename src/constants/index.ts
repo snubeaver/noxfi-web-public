@@ -15,3 +15,9 @@ export const DEFAULT_CHAIN_ID = CHAIN_ID.GOERLI; // for test
 
 // wallet connect project id
 export const WALLETCONNECT_PROJECT_ID = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID;
+
+export const CONTRACT_ADDRESS: Record<string, `0x${string}`> = {
+  DAI: IS_MAINNET
+    ? '0xdc31Ee1784292379Fbb2964b3B9C4124D8F89C60'
+    : '0xdc31Ee1784292379Fbb2964b3B9C4124D8F89C60',
+};

@@ -1,5 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { Web3Modal } from '@web3modal/react';
 import tw, { styled } from 'twin.macro';
+import { WagmiConfig } from 'wagmi';
+
+import { ethereumClient, projectId, wagmiConfig } from '~/configs/setup-wallet';
 
 import { DropdownProfile } from '.';
 
@@ -15,9 +19,14 @@ type Story = StoryObj<typeof meta>;
 
 export const _DropdownProfile: Story = {
   render: () => (
-    <Wrapper>
-      <DropdownProfile />
-    </Wrapper>
+    <>
+      <WagmiConfig config={wagmiConfig}>
+        <Wrapper>
+          <DropdownProfile />
+        </Wrapper>
+      </WagmiConfig>
+      <Web3Modal projectId={projectId} ethereumClient={ethereumClient} />
+    </>
   ),
   args: {},
 };

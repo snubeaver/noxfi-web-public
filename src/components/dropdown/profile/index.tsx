@@ -1,29 +1,37 @@
 import { useRef, useState } from 'react';
 import tw, { styled } from 'twin.macro';
+import { useOnClickOutside } from 'usehooks-ts';
 
 import { COLOR } from '~/assets/colors';
 import { IconLogout } from '~/components/icons';
+import { CONTRACT_ADDRESS } from '~/constants';
+import { useNativeTokenBalances, useTokenBalances } from '~/hooks/data/use-balance';
 import { useConnectWallet } from '~/hooks/data/use-connect-wallet';
+import { shortenAddress } from '~/utils/string';
 
 export const DropdownProfile = () => {
   const ref = useRef<HTMLDivElement>(null);
 
-  const { disconnect } = useConnectWallet();
+  const { address, disconnect } = useConnectWallet();
+  const { formattedWithComma: ethBalance } = useNativeTokenBalances(address);
+  const { formattedWithComma: daiBalance } = useTokenBalances(address, CONTRACT_ADDRESS.DAI);
 
   const [opened, open] = useState(false);
   const toggle = () => open(!opened);
 
+  useOnClickOutside(ref, () => open(false));
+
   return (
     <Wrapper ref={ref} opened={opened}>
-      <ContentWrapper onClick={toggle}>{'addr...addr'}</ContentWrapper>
+      <ContentWrapper onClick={toggle}>{shortenAddress(address ?? '')}</ContentWrapper>
       {opened && (
         <DropdownWrapper>
           <TokenWrapper>
-            <Token>{1000}</Token>
+            <Token>{ethBalance}</Token>
             <Label>{'ETH'}</Label>
           </TokenWrapper>
           <TokenWrapper>
-            <Token>{1000}</Token>
+            <Token>{daiBalance}</Token>
             <Label>{'DAI'}</Label>
           </TokenWrapper>
           <DisconnectWrapper onClick={() => disconnect()}>
