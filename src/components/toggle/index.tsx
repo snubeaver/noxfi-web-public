@@ -1,9 +1,9 @@
-import { HTMLAttributes, useState } from 'react';
-import tw, { styled } from 'twin.macro';
+import { HTMLAttributes, ReactNode, useState } from 'react';
+import tw, { css, styled } from 'twin.macro';
 
 interface ToggleProps {
   id: string;
-  text: string;
+  text: ReactNode;
   selected?: boolean;
   handler?: (id: string) => void;
 }
@@ -52,6 +52,18 @@ interface ToggleButtonProps {
   selected?: boolean;
 }
 const ToggleWrapper = styled.div<ToggleButtonProps>(({ selected }) => [
-  tw`flex-1 flex-shrink-0 px-40 py-12 flex-center rounded-32 bg-gray5 font-sb-20 text-gray3 clickable`,
+  tw`flex-1 flex-shrink-0 px-40 py-12 select-none flex-center rounded-32 bg-gray5 font-sb-20 text-gray3 clickable`,
+
   selected && tw`text-black bg-white`,
+  selected
+    ? css`
+        & svg path {
+          fill: #000;
+        }
+      `
+    : css`
+        & svg path {
+          fill: #6d7684;
+        }
+      `,
 ]);

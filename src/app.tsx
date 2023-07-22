@@ -1,8 +1,9 @@
 import { lazy, Suspense } from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import tw from 'twin.macro';
 
 const DepositPage = lazy(() => import('./pages/deposit'));
+const TradePage = lazy(() => import('./pages/trade'));
 
 const RouteWrapper = tw.main`relative w-full h-full`;
 const App = () => {
@@ -13,7 +14,8 @@ const App = () => {
           <Routes>
             <Route path="/" element={<DepositPage />} />
             <Route path="/deposit" element={<DepositPage />} />
-            <Route path="*" element={<DepositPage />} />
+            <Route path="/trade" element={<TradePage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
       </RouteWrapper>
