@@ -9,18 +9,25 @@ interface Props extends InputHTMLAttributes<HTMLInputElement> {
   placeholder?: string;
   handleChange?: (value: NumberFormatValues) => void;
 }
-export const TextField = ({ label, unit, placeholder = '0.0', value, handleChange }: Props) => {
+export const TextField = ({
+  label,
+  unit,
+  placeholder = '0.0',
+  readOnly,
+  value,
+  handleChange,
+}: Props) => {
   const CustomInput = useCallback(
     ({ ...rest }: Props) => (
       <Wrapper>
         <Label>{label}</Label>
         <InputWrapper>
-          <Input {...rest}></Input>
+          <Input readOnly={readOnly} {...rest}></Input>
           <Unit>{unit}</Unit>
         </InputWrapper>
       </Wrapper>
     ),
-    [label, unit]
+    [label, readOnly, unit]
   );
 
   return (

@@ -20,9 +20,9 @@ const TradePage = () => {
 
   const { data } = useReadLatestRoundDataEthDai({ staleTime: Infinity });
 
-  const [amount, setAmount] = useState<number | undefined>();
-  const [price, setPrice] = useState<number | undefined>();
-  const [calculatedAmount, setCalculatedAmount] = useState<number | undefined>();
+  const [amount, setAmount] = useState<number>();
+  const [price, setPrice] = useState<number>();
+  const [calculatedAmount, setCalculatedAmount] = useState<number>();
 
   const currentEthDaiPrice = data?.ethDai ?? 0;
   const currentDaiEthPrice = data?.daiEth ?? 0;
@@ -38,7 +38,7 @@ const TradePage = () => {
   const toUnit = selected === TRADE_OPTIONS.DAI_ETH ? 'ETH' : 'DAI';
 
   useEffect(() => {
-    if (!amount || !price || amount === 0 || price === 0) {
+    if (!amount || !price) {
       setCalculatedAmount(undefined);
       return;
     }
@@ -80,14 +80,16 @@ const TradePage = () => {
             <TextField
               label="Amount"
               unit={fromUnit}
-              handleChange={value => setAmount(value.floatValue ?? 0)}
+              value={amount}
+              handleChange={value => setAmount(value.floatValue)}
             />
             <TextField
               label="Price"
               unit={currentPriceUnit}
-              handleChange={value => setPrice(value.floatValue ?? 0)}
+              value={price}
+              handleChange={value => setPrice(value.floatValue)}
             />
-            <TextField label="Amount" unit={toUnit} value={calculatedAmount} />
+            <TextField label="Amount" unit={toUnit} value={calculatedAmount} readOnly />
           </TradeInputWrapper>
         </TradeWrapper>
         {isConnected ? (
