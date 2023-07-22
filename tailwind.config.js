@@ -154,6 +154,18 @@ module.exports = {
           transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
           transitionDuration: '150ms',
         },
+
+        '.font-r-12': { fontSize: '12px', lineHeight: '20px', fontWeight: 400 },
+        '.font-r-14': { fontSize: '14px', lineHeight: '22px', fontWeight: 400 },
+        '.font-r-16': { fontSize: '16px', lineHeight: '24px', fontWeight: 400 },
+        '.font-r-24': { fontSize: '24px', lineHeight: '32px', fontWeight: 400 },
+        '.font-r-28': { fontSize: '28px', lineHeight: '38px', fontWeight: 400 },
+
+        '.font-sb-12': { fontSize: '12px', lineHeight: '20px', fontWeight: 600 },
+        '.font-sb-14': { fontSize: '14px', lineHeight: '22px', fontWeight: 600 },
+        '.font-sb-18': { fontSize: '18px', lineHeight: '26px', fontWeight: 600 },
+        '.font-sb-20': { fontSize: '20px', lineHeight: '28px', fontWeight: 600 },
+        '.font-sb-28': { fontSize: '28px', lineHeight: '38px', fontWeight: 600 },
       });
       addUtilities({});
     }),
