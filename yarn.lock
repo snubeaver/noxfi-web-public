@@ -1749,6 +1749,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@esbuild-plugins/node-globals-polyfill@npm:^0.2.3":
+  version: 0.2.3
+  resolution: "@esbuild-plugins/node-globals-polyfill@npm:0.2.3"
+  peerDependencies:
+    esbuild: "*"
+  checksum: f83eeaa382680b26a3b1cf6c396450332c41d2dc0f9fd935d3f4bacf5412bef7383d2aeb4246a858781435b7c005a570dadc81051f8a038f1ef2111f17d3d8b0
+  languageName: node
+  linkType: hard
+
 "@esbuild/android-arm64@npm:0.18.15":
   version: 0.18.15
   resolution: "@esbuild/android-arm64@npm:0.18.15"
@@ -9973,6 +9982,7 @@ __metadata:
     "@emotion/babel-plugin-jsx-pragmatic": ^0.2.0
     "@emotion/react": ^11.11.0
     "@emotion/styled": ^11.11.0
+    "@esbuild-plugins/node-globals-polyfill": ^0.2.3
     "@storybook/addon-essentials": ^7.0.7
     "@storybook/builder-vite": ^7.0.7
     "@storybook/react": ^7.0.7

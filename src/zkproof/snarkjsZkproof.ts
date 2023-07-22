@@ -18,19 +18,6 @@ export async function exportCallDataGroth16(
   const wasmData = await fetchFile(wasmPath);
   const zkeyData = await fetchFile(zkeyPath);
 
-  console.log(wasmData, zkeyData);
-  // const { proof: _proof, publicSignals: _publicSignals } = await groth16.fullProve(
-  //   input,
-  //   'zkproof/deposit.wasm',
-  //   'zkproof/deposit_final.zkey'
-  // );
-  // const { proof: _proof, publicSignals: _publicSignals } = await groth16.fullProve(
-  //   input,
-  //   wasmPath,
-  //   zkeyPath
-  // );
-
-  // TODO: 여기
   const { proof: _proof, publicSignals: _publicSignals } = await groth16.fullProve(
     input,
     wasmData,
