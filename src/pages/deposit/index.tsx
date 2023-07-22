@@ -10,10 +10,73 @@ import { useConnectWallet } from '~/hooks/data/use-connect-wallet';
 import { useDepositState } from '~/states/data/deposit';
 import { DEPOSIT_OPTIONS } from '~/types';
 
+import { depositCalldata } from '../../zkproof/deposit/snarkjsDeposit';
+
 const DepositPage = () => {
   const { isConnected } = useConnectWallet();
   const { selected, select } = useDepositState();
   const { isOpen, open } = useWeb3Modal();
+  const [amount, setAmount] = useState<number | undefined>();
+
+  const handleDeposit = async () => {
+    if (!isConnected || !amount || amount === 0) {
+      return;
+    }
+    calculateProof();
+  };
+
+  const calculateProof = async () => {
+    if (!amount || amount === 0) {
+      return;
+    }
+
+    const salt = '11';
+    const calldata = await depositCalldata(
+      salt,
+      Math.floor(amount).toString(),
+      selected === DEPOSIT_OPTIONS.DAI ? '0' : '1'
+    );
+    console.log(salt, Math.floor(amount).toString(), selected === DEPOSIT_OPTIONS.DAI ? '0' : '1');
+    console.log(calldata);
+    if (!calldata) {
+      return 'Invalid inputs to generate witness.';
+    }
+    console.log('calldata', calldata);
+    // try {
+    //   let result;
+    //   if (
+    //     dataAccount?.address &&
+    //     activeChain.id.toString() === networks.selectedChain
+    //   ) {
+    //     result = await contract.verifySudoku(
+    //       calldata.a,
+    //       calldata.b,
+    //       calldata.c,
+    //       calldata.Input
+    //     );
+    //   } else {
+    //     result = await contractNoSigner.verifySudoku(
+    //       calldata.a,
+    //       calldata.b,
+    //       calldata.c,
+    //       calldata.Input
+    //     );
+    //   }
+    //   console.log("result", result);
+    //   setLoadingVerifyBtn(false);
+    //   alert("Successfully verified");
+    // } catch (error) {
+    //   setLoadingVerifyBtn(false);
+    //   console.log(error);
+    //   alert("Wrong solution");
+    // }
+  };
+
+  useEffect(() => {
+    if (amount) {
+      console.log(amount);
+    }
+  }, [amount]);
 
   const [amount, setAmount] = useState<number | string>('');
 
@@ -47,7 +110,7 @@ const DepositPage = () => {
           />
         </DepositWrapper>
         {isConnected ? (
-          <ButtonLarge text="Deposit" />
+          <ButtonLarge text="Deposit" onClick={handleDeposit} />
         ) : (
           <ButtonLarge text="Connect Wallet" isLoading={isOpen} onClick={open} />
         )}

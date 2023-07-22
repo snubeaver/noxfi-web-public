@@ -12,8 +12,10 @@ export async function depositCalldata(salt: string, amount: string, asset: strin
   try {
     dataResult = await exportCallDataGroth16(
       input,
-      '/zkproof/deposit.wasm',
-      '/zkproof/deposit_final.zkey'
+      'http://localhost:8000/deposit.wasm',
+      'http://localhost:8000/deposit_final.zkey'
+      // '/zkproof/deposit.wasm',
+      // '/zkproof/deposit_final.zkey'
     );
   } catch (error) {
     console.log(error);
