@@ -33,9 +33,10 @@ input {
 }
 
 * {
-  font-variant-ligatures: no-contextual;
+  font-variant-ligatures: no-contextual !important;
   box-sizing: border-box;
 }
+
 *:focus {
   border: none;
   outline: none;
