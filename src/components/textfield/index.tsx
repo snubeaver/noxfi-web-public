@@ -32,7 +32,7 @@ const CustomInput = ({ label, unit, ...rest }: Props) => (
 const Wrapper = tw.div`
   w-480 py-12 px-24
   flex flex-col gap-4
-  bg-gray4 rounded-4
+  bg-gray4 rounded-8
 `;
 
 const Label = tw.label`
