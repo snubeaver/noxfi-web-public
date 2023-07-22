@@ -27,10 +27,24 @@ module.exports = {
     extend: {
       colors: {
         ...defaultTheme.colors,
+
+        black: '#1a1a1a',
+        white: '#ffffff',
+
+        gray5: '#262a2f',
+        gray4: '#424851',
+        gray3: '#6d7684',
+        gray2: '#adb3be',
+        gray1: '#e5e7ec',
+
+        red: '#ff6b6b',
+        yellow: '#d3ff75',
+        'light-yellow': '#ebffbf',
+        blue: '#6b95ff',
       },
 
       fontFamily: {
-        sans: ['Inter', ...defaultTheme.fontFamily.sans],
+        sans: ['Pretendard', ...defaultTheme.fontFamily.sans],
       },
 
       fontSize: {
@@ -107,7 +121,52 @@ module.exports = {
   plugins: [
     plugin(function ({ addBase, addComponents, addUtilities, theme }) {
       addBase({});
-      addComponents({});
+      addComponents({
+        '.flex-center': {
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+        '.absolute-center': {
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+        },
+        '.absolute-center-x': {
+          left: '50%',
+          transform: 'translateX(-50%)',
+        },
+        '.absolute-center-y': {
+          top: '50%',
+          transform: 'translateY(-50%)',
+        },
+
+        '.clickable': {
+          cursor: 'pointer',
+        },
+        '.non-clickable': {
+          cursor: 'not-allowed',
+          userSelect: 'none',
+        },
+
+        '.transition-color': {
+          transitionProperty: 'background-color,border-color,color,fill,stroke',
+          transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+          transitionDuration: '150ms',
+        },
+
+        '.font-r-12': { fontSize: '12px', lineHeight: '20px', fontWeight: 400 },
+        '.font-r-14': { fontSize: '14px', lineHeight: '22px', fontWeight: 400 },
+        '.font-r-16': { fontSize: '16px', lineHeight: '24px', fontWeight: 400 },
+        '.font-r-24': { fontSize: '24px', lineHeight: '32px', fontWeight: 400 },
+        '.font-r-28': { fontSize: '28px', lineHeight: '38px', fontWeight: 400 },
+
+        '.font-sb-12': { fontSize: '12px', lineHeight: '20px', fontWeight: 600 },
+        '.font-sb-14': { fontSize: '14px', lineHeight: '22px', fontWeight: 600 },
+        '.font-sb-18': { fontSize: '18px', lineHeight: '26px', fontWeight: 600 },
+        '.font-sb-20': { fontSize: '20px', lineHeight: '28px', fontWeight: 600 },
+        '.font-sb-28': { fontSize: '28px', lineHeight: '38px', fontWeight: 600 },
+      });
       addUtilities({});
     }),
   ],
