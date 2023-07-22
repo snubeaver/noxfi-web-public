@@ -27,6 +27,20 @@ module.exports = {
     extend: {
       colors: {
         ...defaultTheme.colors,
+
+        black: '#1a1a1a',
+        white: '#ffffff',
+
+        gray5: '#262a2f',
+        gray4: '#424851',
+        gray3: '#6d7684',
+        gray2: '#adb3be',
+        gray1: '#e5e7ec',
+
+        red: '#ff6b6b',
+        yellow: '#d3ff75',
+        'light-yellow': '#ebffbf',
+        blue: '#6b95ff',
       },
 
       fontFamily: {
