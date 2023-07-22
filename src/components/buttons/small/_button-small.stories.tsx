@@ -8,6 +8,7 @@ const meta = {
   tags: ['autodocs'],
   argTypes: {
     text: { control: 'text' },
+    isLoading: { control: 'boolean' },
     disabled: { control: 'boolean' },
   },
 } satisfies Meta<typeof ButtonSmall>;
@@ -18,6 +19,7 @@ type Story = StoryObj<typeof meta>;
 export const _ButtonSmall: Story = {
   args: {
     text: 'Text here',
+    isLoading: false,
     disabled: false,
     onClick: () => console.log('clicked'),
   },
