@@ -5,7 +5,7 @@ import tw from 'twin.macro';
 interface Props extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   unit?: string;
-  value?: number;
+  value?: number | string;
   placeholder?: string;
   handleChange?: (value: NumberFormatValues) => void;
 }
