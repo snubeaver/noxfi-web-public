@@ -1,4 +1,5 @@
 import { useWeb3Modal } from '@web3modal/react';
+import { useEffect, useState } from 'react';
 import tw from 'twin.macro';
 
 import { ButtonLarge } from '~/components/buttons';
@@ -6,22 +7,43 @@ import { Gnb } from '~/components/gnb';
 import { IconNext } from '~/components/icons';
 import { TextField } from '~/components/textfield';
 import { Toggle } from '~/components/toggle';
+import { useReadLatestRoundDataEthDai } from '~/contracts/chainlink-read';
 import { useConnectWallet } from '~/hooks/data/use-connect-wallet';
 import { useTradeState } from '~/states/data/trade';
 import { TRADE_OPTIONS } from '~/types';
-import { parseNumberWithComma } from '~/utils/number';
+import { parseFloat, parseNumberWithComma } from '~/utils/number';
 
 const TradePage = () => {
   const { isConnected } = useConnectWallet();
   const { selected, select } = useTradeState();
   const { isOpen, open } = useWeb3Modal();
 
-  const currentPrice = selected === TRADE_OPTIONS.DAI_ETH ? '1800' : '0.00055';
-  const parsedCurrentPrice = parseNumberWithComma(parseFloat(currentPrice));
+  const { data } = useReadLatestRoundDataEthDai({ staleTime: Infinity });
+
+  const [amount, setAmount] = useState<number>();
+  const [price, setPrice] = useState<number>();
+  const [calculatedAmount, setCalculatedAmount] = useState<number>();
+
+  const currentEthDaiPrice = data?.ethDai ?? 0;
+  const currentDaiEthPrice = data?.daiEth ?? 0;
+
+  const currentPrice = selected === TRADE_OPTIONS.DAI_ETH ? currentDaiEthPrice : currentEthDaiPrice;
+  const parsedCurrentPrice =
+    currentPrice < 0.001
+      ? parseFloat(currentPrice, 8)
+      : parseNumberWithComma(Number(parseFloat(currentPrice, 4)));
 
   const currentPriceUnit = selected === TRADE_OPTIONS.DAI_ETH ? 'DAI/ETH' : 'ETH/DAI';
   const fromUnit = selected === TRADE_OPTIONS.DAI_ETH ? 'DAI' : 'ETH';
   const toUnit = selected === TRADE_OPTIONS.DAI_ETH ? 'ETH' : 'DAI';
+
+  useEffect(() => {
+    if (!amount || !price) {
+      setCalculatedAmount(undefined);
+      return;
+    }
+    setCalculatedAmount(Number(parseFloat(amount * price, 8)));
+  }, [amount, price]);
 
   return (
     <Wrapper>
@@ -55,9 +77,19 @@ const TradePage = () => {
           />
           <TradeInputWrapper>
             <CurrentPrice>{`Current Price : ${parsedCurrentPrice} ${currentPriceUnit}`}</CurrentPrice>
-            <TextField label="Amount" unit={fromUnit} />
-            <TextField label="Price" unit={currentPriceUnit} />
-            <TextField label="Amount" unit={toUnit} />
+            <TextField
+              label="Amount"
+              unit={fromUnit}
+              value={amount}
+              handleChange={value => setAmount(value.floatValue)}
+            />
+            <TextField
+              label="Price"
+              unit={currentPriceUnit}
+              value={price}
+              handleChange={value => setPrice(value.floatValue)}
+            />
+            <TextField label="Amount" unit={toUnit} value={calculatedAmount} readOnly />
           </TradeInputWrapper>
         </TradeWrapper>
         {isConnected ? (

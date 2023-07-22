@@ -1,33 +1,47 @@
-import { InputHTMLAttributes } from 'react';
-import { NumericFormat } from 'react-number-format';
+import { InputHTMLAttributes, useCallback } from 'react';
+import { NumberFormatValues, NumericFormat } from 'react-number-format';
 import tw from 'twin.macro';
 
 interface Props extends InputHTMLAttributes<HTMLInputElement> {
-  label: string;
-  unit: string;
+  label?: string;
+  unit?: string;
+  value?: number;
   placeholder?: string;
+  handleChange?: (value: NumberFormatValues) => void;
 }
-export const TextField = ({ label, unit, placeholder = '0.0' }: Props) => {
+export const TextField = ({
+  label,
+  unit,
+  placeholder = '0.0',
+  readOnly,
+  value,
+  handleChange,
+}: Props) => {
+  const CustomInput = useCallback(
+    ({ ...rest }: Props) => (
+      <Wrapper>
+        <Label>{label}</Label>
+        <InputWrapper>
+          <Input readOnly={readOnly} {...rest}></Input>
+          <Unit>{unit}</Unit>
+        </InputWrapper>
+      </Wrapper>
+    ),
+    [label, readOnly, unit]
+  );
+
   return (
     <NumericFormat
       allowLeadingZeros={false}
       allowNegative={false}
       placeholder={placeholder}
       thousandSeparator
-      customInput={props => <CustomInput label={label} unit={unit} {...props} />}
+      onValueChange={values => handleChange?.(values)}
+      value={value}
+      customInput={CustomInput}
     />
   );
 };
-
-const CustomInput = ({ label, unit, ...rest }: Props) => (
-  <Wrapper>
-    <Label>{label}</Label>
-    <InputWrapper>
-      <Input {...rest}></Input>
-      <Unit>{unit}</Unit>
-    </InputWrapper>
-  </Wrapper>
-);
 
 const Wrapper = tw.div`
   w-480 py-12 px-24
