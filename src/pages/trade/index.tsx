@@ -1,4 +1,5 @@
 import { useWeb3Modal } from '@web3modal/react';
+import { useEffect, useState } from 'react';
 import tw from 'twin.macro';
 
 import { ButtonLarge } from '~/components/buttons';
@@ -19,6 +20,10 @@ const TradePage = () => {
 
   const { data } = useReadLatestRoundDataEthDai({ staleTime: Infinity });
 
+  const [amount, setAmount] = useState<number | undefined>();
+  const [price, setPrice] = useState<number | undefined>();
+  const [calculatedAmount, setCalculatedAmount] = useState<number | undefined>();
+
   const currentEthDaiPrice = data?.ethDai ?? 0;
   const currentDaiEthPrice = data?.daiEth ?? 0;
 
@@ -31,6 +36,14 @@ const TradePage = () => {
   const currentPriceUnit = selected === TRADE_OPTIONS.DAI_ETH ? 'DAI/ETH' : 'ETH/DAI';
   const fromUnit = selected === TRADE_OPTIONS.DAI_ETH ? 'DAI' : 'ETH';
   const toUnit = selected === TRADE_OPTIONS.DAI_ETH ? 'ETH' : 'DAI';
+
+  useEffect(() => {
+    if (!amount || !price || amount === 0 || price === 0) {
+      setCalculatedAmount(undefined);
+      return;
+    }
+    setCalculatedAmount(Number(parseFloat(amount * price, 8)));
+  }, [amount, price]);
 
   return (
     <Wrapper>
@@ -64,9 +77,17 @@ const TradePage = () => {
           />
           <TradeInputWrapper>
             <CurrentPrice>{`Current Price : ${parsedCurrentPrice} ${currentPriceUnit}`}</CurrentPrice>
-            <TextField label="Amount" unit={fromUnit} />
-            <TextField label="Price" unit={currentPriceUnit} />
-            <TextField label="Amount" unit={toUnit} />
+            <TextField
+              label="Amount"
+              unit={fromUnit}
+              handleChange={value => setAmount(value.floatValue ?? 0)}
+            />
+            <TextField
+              label="Price"
+              unit={currentPriceUnit}
+              handleChange={value => setPrice(value.floatValue ?? 0)}
+            />
+            <TextField label="Amount" unit={toUnit} value={calculatedAmount} />
           </TradeInputWrapper>
         </TradeWrapper>
         {isConnected ? (
