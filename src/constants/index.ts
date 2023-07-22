@@ -11,7 +11,7 @@ export const CHAIN_ID = {
   ETH: 1,
   GOERLI: 5,
 };
-export const DEFAULT_CHAIN_ID = CHAIN_ID.ETH;
+export const DEFAULT_CHAIN_ID = CHAIN_ID.GOERLI; // for test
 
 // wallet connect project id
 export const WALLETCONNECT_PROJECT_ID = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID;

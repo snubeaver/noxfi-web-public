@@ -3,9 +3,12 @@ import tw, { styled } from 'twin.macro';
 
 import { COLOR } from '~/assets/colors';
 import { IconLogout } from '~/components/icons';
+import { useConnectWallet } from '~/hooks/data/use-connect-wallet';
 
 export const DropdownProfile = () => {
   const ref = useRef<HTMLDivElement>(null);
+
+  const { disconnect } = useConnectWallet();
 
   const [opened, open] = useState(false);
   const toggle = () => open(!opened);
@@ -23,7 +26,7 @@ export const DropdownProfile = () => {
             <Token>{1000}</Token>
             <Label>{'DAI'}</Label>
           </TokenWrapper>
-          <DisconnectWrapper onClick={() => console.log('disconnect')}>
+          <DisconnectWrapper onClick={() => disconnect()}>
             <IconLogout color={COLOR.GRAY2} />
             Disconnect
           </DisconnectWrapper>

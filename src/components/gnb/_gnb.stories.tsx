@@ -1,6 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { Web3Modal } from '@web3modal/react';
 import { BrowserRouter } from 'react-router-dom';
 import tw, { css, styled } from 'twin.macro';
+import { WagmiConfig } from 'wagmi';
+
+import { ethereumClient, projectId, wagmiConfig } from '~/configs/setup-wallet';
 
 import { Gnb } from '.';
 
@@ -16,17 +20,22 @@ type Story = StoryObj<typeof meta>;
 
 export const _Gnb: Story = {
   render: () => (
-    <BrowserRouter>
-      <Wrapper>
-        <Gnb />
-      </Wrapper>
-    </BrowserRouter>
+    <>
+      <WagmiConfig config={wagmiConfig}>
+        <BrowserRouter>
+          <Wrapper>
+            <Gnb />
+          </Wrapper>
+        </BrowserRouter>
+      </WagmiConfig>
+      <Web3Modal projectId={projectId} ethereumClient={ethereumClient} />
+    </>
   ),
   args: {},
 };
 
 const Wrapper = styled.div(() => [
-  tw`relative w-full bg-black h-300`,
+  tw`relative w-full bg-black h-800`,
   css`
     & > div {
       position: absolute !important;

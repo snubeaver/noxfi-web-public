@@ -1,7 +1,12 @@
+import { useWeb3Modal } from '@web3modal/react';
 import { useNavigate } from 'react-router-dom';
 import tw from 'twin.macro';
 
 import logo from '~/assets/images/logo.png';
+import { useConnectWallet } from '~/hooks/data/use-connect-wallet';
+
+import { ButtonMedium } from '../buttons';
+import { DropdownProfile } from '../dropdown/profile';
 
 const MENU = [
   {
@@ -23,6 +28,8 @@ const MENU = [
 
 export const Gnb = () => {
   const navigate = useNavigate();
+  const { isConnected } = useConnectWallet();
+  const { isOpen, open } = useWeb3Modal();
 
   return (
     <Wrapper>
@@ -33,6 +40,11 @@ export const Gnb = () => {
             {text}
           </MenuWrapper>
         ))}
+        {isConnected ? (
+          <DropdownProfile />
+        ) : (
+          <ButtonMedium text="Connect Wallet" isLoading={isOpen} onClick={open} />
+        )}
       </ContentWrapper>
     </Wrapper>
   );
