@@ -14,7 +14,7 @@ export const useTradeState = create<TradeState>()(
   immer(
     logger(set => ({
       name: 'trade-store',
-      selected: TRADE_OPTIONS.DAI_ETH,
+      selected: TRADE_OPTIONS.ETH_DAI,
       select: (select: TRADE_OPTIONS) => set(() => ({ selected: select })),
       reset: () => set(() => ({ selected: TRADE_OPTIONS.DAI_ETH })),
     }))

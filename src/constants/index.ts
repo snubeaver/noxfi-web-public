@@ -21,3 +21,9 @@ export const CONTRACT_ADDRESS: Record<string, `0x${string}`> = {
     ? '0xdc31Ee1784292379Fbb2964b3B9C4124D8F89C60'
     : '0xdc31Ee1784292379Fbb2964b3B9C4124D8F89C60',
 };
+
+export const CHAINLINK_RATE_ADDRESS: Record<string, `0x${string}`> = {
+  ETH_DAI: IS_MAINNET
+    ? '0x773616e4d11a78f511299002da57a0a94577f1f4'
+    : '0x773616e4d11a78f511299002da57a0a94577f1f4',
+};
