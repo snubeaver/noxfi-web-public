@@ -9,7 +9,7 @@ import { useConnectWallet } from '~/hooks/data/use-connect-wallet';
 import { useDepositState } from '~/states/data/deposit';
 import { DEPOSIT_OPTIONS } from '~/types';
 
-const MainPage = () => {
+const DepositPage = () => {
   const { isConnected } = useConnectWallet();
   const { selected, select } = useDepositState();
   const { isOpen, open } = useWeb3Modal();
@@ -58,4 +58,4 @@ const Title = tw.div`
   font-sb-28 text-white
 `;
 
-export default MainPage;
+export default DepositPage;
