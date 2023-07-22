@@ -1,4 +1,5 @@
 import { useWeb3Modal } from '@web3modal/react';
+import { useEffect, useState } from 'react';
 import tw from 'twin.macro';
 
 import { ButtonLarge } from '~/components/buttons';
@@ -13,6 +14,12 @@ const DepositPage = () => {
   const { isConnected } = useConnectWallet();
   const { selected, select } = useDepositState();
   const { isOpen, open } = useWeb3Modal();
+
+  const [amount, setAmount] = useState<number | string>('');
+
+  useEffect(() => {
+    setAmount('');
+  }, [selected]);
 
   return (
     <Wrapper>
@@ -32,7 +39,12 @@ const DepositPage = () => {
               handler: id => select(id as DEPOSIT_OPTIONS),
             }}
           />
-          <TextField label="Amount" unit={selected} />
+          <TextField
+            label="Amount"
+            unit={selected}
+            value={amount}
+            handleChange={value => setAmount(value.floatValue ?? '')}
+          />
         </DepositWrapper>
         {isConnected ? (
           <ButtonLarge text="Deposit" />
