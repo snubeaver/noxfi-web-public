@@ -4,7 +4,9 @@ import { Gnb } from '~/components/gnb';
 
 import { BalanceHeader } from './components/balance-header';
 import { BalanceRow } from './components/balance-row';
-import { balances } from './data';
+import { OrderHeader } from './components/order-header';
+import { OrderRow } from './components/order-row';
+import { balances, orders } from './data';
 
 const MyPage = () => {
   return (
@@ -25,7 +27,13 @@ const MyPage = () => {
 
         <PositionWrapper>
           <PositionLabel>Orders</PositionLabel>
-          <TableWrapper></TableWrapper>
+          <TableWrapper>
+            <OrderHeader />
+            <Divider />
+            {orders.map(({ id, ...rest }) => (
+              <OrderRow key={id} {...rest} />
+            ))}
+          </TableWrapper>
         </PositionWrapper>
       </ContentWrapper>
     </Wrapper>

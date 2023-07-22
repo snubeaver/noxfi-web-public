@@ -5,7 +5,7 @@ import { formatEther } from 'viem';
 import { COLOR } from '~/assets/colors';
 import { ButtonSmall } from '~/components/buttons';
 import { IconNote, IconWatch, IconWatchOff } from '~/components/icons';
-import { parseFloat, parseNumberWithComma } from '~/utils/number';
+import { parseFloat, parseNumberWithComma, parseNumberWithUnit } from '~/utils/number';
 
 import { Balance } from '../types';
 
@@ -16,7 +16,10 @@ export const BalanceRow = ({ note, noteHidden, balance, ...rest }: Props) => {
   const [shown, show] = useState(noteHidden);
   const toggle = () => show(!shown);
 
-  const parsedAmount = parseNumberWithComma(Number(parseFloat(Number(formatEther(amount)), 4)));
+  const parsedToken = Number(parseFloat(Number(formatEther(amount)), 4));
+  const parsedAmount =
+    parsedToken > 1000000 ? parseNumberWithUnit(parsedToken) : parseNumberWithComma(parsedToken);
+
   const array = [...new Array(8)].map((_, i) => i + 1);
 
   return (
