@@ -1,7 +1,7 @@
 import tw from 'twin.macro';
 
 const App = () => {
-  return <Wrapper>test</Wrapper>;
+  return <Wrapper></Wrapper>;
 };
 
 const Wrapper = tw.div`
