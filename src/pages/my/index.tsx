@@ -52,7 +52,7 @@ const MyPage = () => {
             <BalanceHeader />
             <Divider />
             {currentBalances.map(({ id, ...rest }) => (
-              <BalanceRow key={id} {...rest} />
+              <BalanceRow key={id} id={id} {...rest} />
             ))}
           </TableWrapper>
         </PositionWrapper>
@@ -63,7 +63,7 @@ const MyPage = () => {
             <OrderHeader />
             <Divider />
             {orders.map(({ id, ...rest }) => (
-              <OrderRow key={id} {...rest} />
+              <OrderRow key={id} id={id} {...rest} />
             ))}
           </TableWrapper>
         </PositionWrapper>

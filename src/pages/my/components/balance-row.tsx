@@ -1,17 +1,25 @@
 import { HTMLAttributes, useState } from 'react';
 import tw from 'twin.macro';
+import { useLocalStorage, useReadLocalStorage } from 'usehooks-ts';
 import { formatEther } from 'viem';
 
 import { COLOR } from '~/assets/colors';
 import { ButtonSmall } from '~/components/buttons';
 import { IconNote, IconWatch, IconWatchOff } from '~/components/icons';
+import { LOCALSTORAGE_KEYS } from '~/constants';
 import { parseFloat, parseNumberWithComma, parseNumberWithUnit } from '~/utils/number';
 
 import { Balance } from '../types';
 
-interface Props extends Omit<Balance, 'id'>, HTMLAttributes<HTMLDivElement> {}
-export const BalanceRow = ({ note, noteHidden, balance, ...rest }: Props) => {
+interface Props extends Balance, Omit<HTMLAttributes<HTMLDivElement>, 'id'> {}
+export const BalanceRow = ({ note, noteHidden, balance, id, ...rest }: Props) => {
   const { amount, tokenTicker } = balance;
+
+  const currentBalance = useReadLocalStorage<Balance[]>(LOCALSTORAGE_KEYS.BALANCES);
+  const [balances, setBalances] = useLocalStorage<Balance[]>(
+    LOCALSTORAGE_KEYS.BALANCES,
+    currentBalance ?? []
+  );
 
   const [shown, show] = useState(noteHidden);
   const toggle = () => show(!shown);
@@ -21,6 +29,13 @@ export const BalanceRow = ({ note, noteHidden, balance, ...rest }: Props) => {
     parsedToken > 1000000 ? parseNumberWithUnit(parsedToken) : parseNumberWithComma(parsedToken);
 
   const array = [...new Array(8)].map((_, i) => i + 1);
+
+  const handleWithdraw = () => {
+    alert('successfully withdraw balance ');
+
+    const filtered = balances.filter(b => b.id !== id);
+    setBalances(filtered);
+  };
 
   return (
     <Wrapper {...rest}>
@@ -36,12 +51,7 @@ export const BalanceRow = ({ note, noteHidden, balance, ...rest }: Props) => {
       </NoteWrapper>
       <BalanceWrapper>{`${parsedAmount} ${tokenTicker.toUpperCase()}`}</BalanceWrapper>
       <ButtonWrapper>
-        <ButtonSmall
-          text="Withdraw"
-          onClick={() => {
-            alert('successfully withdraw balance ');
-          }}
-        />
+        <ButtonSmall text="Withdraw" onClick={handleWithdraw} />
       </ButtonWrapper>
     </Wrapper>
   );

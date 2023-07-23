@@ -1,17 +1,27 @@
 import upperFirst from 'lodash-es/upperFirst';
 import { HTMLAttributes, useState } from 'react';
 import tw, { styled } from 'twin.macro';
+import { useLocalStorage, useReadLocalStorage } from 'usehooks-ts';
 import { formatEther } from 'viem';
 
 import { COLOR } from '~/assets/colors';
 import { ButtonSmall } from '~/components/buttons';
 import { IconNext, IconNote, IconWatch, IconWatchOff } from '~/components/icons';
+import { LOCALSTORAGE_KEYS } from '~/constants';
 import { parseFloat, parseNumberWithComma, parseNumberWithUnit } from '~/utils/number';
 
-import { Order, ORDER_STATUS } from '../types';
+import { Balance, Order, ORDER_STATUS } from '../types';
 
-interface Props extends Omit<Order, 'id'>, HTMLAttributes<HTMLDivElement> {}
-export const OrderRow = ({ note, noteHidden, from, to, status, ...rest }: Props) => {
+interface Props extends Order, Omit<HTMLAttributes<HTMLDivElement>, 'id'> {}
+export const OrderRow = ({ note, noteHidden, from, to, status, id, ...rest }: Props) => {
+  const currentOrders = useReadLocalStorage<Order[]>(LOCALSTORAGE_KEYS.ORDERS);
+  const [order, setOrder] = useLocalStorage<Order[]>(LOCALSTORAGE_KEYS.ORDERS, currentOrders ?? []);
+  const currentBalance = useReadLocalStorage<Balance[]>(LOCALSTORAGE_KEYS.BALANCES);
+  const [balance, setBalance] = useLocalStorage<Balance[]>(
+    LOCALSTORAGE_KEYS.BALANCES,
+    currentBalance ?? []
+  );
+
   const { amount: fromAmount, tokenTicker: fromTokenTicker } = from;
   const { amount: toAmount, tokenTicker: toTokenTicker } = to;
 
@@ -31,6 +41,27 @@ export const OrderRow = ({ note, noteHidden, from, to, status, ...rest }: Props)
       : parseNumberWithComma(parsedToToken);
 
   const array = [...new Array(8)].map((_, i) => i + 1);
+
+  const handleClaim = () => {
+    const filteredOrder = order.filter(o => o.id !== id);
+    setOrder(filteredOrder);
+
+    const addedBalance = balance.concat({
+      id: Date.now(),
+      note: note,
+      noteHidden: true,
+      balance: to,
+    });
+    setBalance(addedBalance);
+
+    alert('successfully claim matched balance');
+  };
+
+  const handleRefund = () => {
+    const filteredOrder = order.filter(o => o.id !== id);
+    setOrder(filteredOrder);
+    alert('successfully refund balance');
+  };
 
   return (
     <Wrapper {...rest}>
@@ -52,16 +83,10 @@ export const OrderRow = ({ note, noteHidden, from, to, status, ...rest }: Props)
       <StatusWrapper>
         <StatusText status={status}>{upperFirst(status.toLowerCase())}</StatusText>
         {status === ORDER_STATUS.MATCHED && (
-          <ButtonSmall
-            text="Claim"
-            style={{ width: '72px' }}
-            onClick={() => {
-              alert('successfully claim matched balance');
-            }}
-          />
+          <ButtonSmall text="Claim" style={{ width: '72px' }} onClick={handleClaim} />
         )}
         {status === ORDER_STATUS.CANCELED && (
-          <ButtonSmall text="Refund" style={{ width: '72px' }} />
+          <ButtonSmall text="Refund" style={{ width: '72px' }} onClick={handleRefund} />
         )}
       </StatusWrapper>
     </Wrapper>
