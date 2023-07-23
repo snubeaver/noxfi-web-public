@@ -29,7 +29,7 @@
       "~/*": ["src/*"]
     }
   },
-  "include": ["src", "src/zkproof", "src/zkproof/deposit"],
+  "include": ["src", "src/zkproof"],
   "exclude": ["node_modules", ".yarn"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
