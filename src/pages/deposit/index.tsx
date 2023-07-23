@@ -65,6 +65,8 @@ const DepositPage = () => {
     setProofB(calldata.b);
     setProofC(calldata.c);
     setDepositInput(calldata.Input);
+
+    handleDepositContract();
   };
 
   const handleDepositContract = useCallback(async () => {
@@ -76,16 +78,14 @@ const DepositPage = () => {
     try {
       const result = await depositAsync?.();
       console.log('result', result);
-      alert('Successfully verified');
+      if (result) {
+        alert('Successfully deposit verified');
+      }
     } catch (error) {
       console.log(error);
       alert('deposit verifying failed');
     }
   }, [connect, depositAsync, isConnected, isDepositLoading]);
-
-  useEffect(() => {
-    handleDepositContract();
-  }, [depositAsync, handleDepositContract, proofA, proofB, proofC, depositInput]);
 
   const [amount, setAmount] = useState<number | string>('');
 
