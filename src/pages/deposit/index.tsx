@@ -1,6 +1,6 @@
 import { InjectedConnector } from '@wagmi/core';
 import { useWeb3Modal } from '@web3modal/react';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import tw from 'twin.macro';
 import { useLocalStorage, useReadLocalStorage } from 'usehooks-ts';
 import { parseEther } from 'viem';

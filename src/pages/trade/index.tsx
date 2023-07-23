@@ -21,7 +21,7 @@ import { TRADE_OPTIONS } from '~/types';
 import { parseFloat, parseNumberWithComma } from '~/utils/number';
 import { orderCalldata } from '~/zkproof/order/snarkjsOrder';
 
-import { Order, ORDER_STATUS } from '../my/types';
+import { Balance, Order, ORDER_STATUS } from '../my/types';
 
 const TradePage = () => {
   const { isConnected } = useConnectWallet();
@@ -39,6 +39,11 @@ const TradePage = () => {
 
   const currentOrders = useReadLocalStorage<Order[]>(LOCALSTORAGE_KEYS.ORDERS);
   const [order, setOrder] = useLocalStorage<Order[]>(LOCALSTORAGE_KEYS.ORDERS, currentOrders ?? []);
+  const currentBalance = useReadLocalStorage<Balance[]>(LOCALSTORAGE_KEYS.BALANCES);
+  const [_, setBalance] = useLocalStorage<Balance[]>(
+    LOCALSTORAGE_KEYS.BALANCES,
+    currentBalance ?? []
+  );
 
   const { data: ethDaiData } = useReadLatestRoundDataEthDai({ staleTime: Infinity });
 
@@ -147,6 +152,8 @@ const TradePage = () => {
       });
 
       setOrder(addedOrder);
+      // remove all balance
+      setBalance([]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
