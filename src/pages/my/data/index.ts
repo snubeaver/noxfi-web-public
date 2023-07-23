@@ -91,3 +91,22 @@ export const orders: Order[] = [
     status: ORDER_STATUS.DONE,
   },
 ];
+
+export const matchedOrders: Order[] = [
+  {
+    id: 1,
+    note: 'test note',
+    noteHidden: true,
+    from: {
+      amount: parseEther('1'),
+      tokenTicker: 'ETH',
+      decimalPoints: 18,
+    },
+    to: {
+      amount: parseEther('1900'),
+      tokenTicker: 'DAI',
+      decimalPoints: 18,
+    },
+    status: ORDER_STATUS.MATCHED,
+  },
+];

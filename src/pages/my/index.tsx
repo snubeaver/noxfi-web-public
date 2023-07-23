@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import tw from 'twin.macro';
 import { useReadLocalStorage } from 'usehooks-ts';
 
@@ -8,11 +9,12 @@ import { BalanceHeader } from './components/balance-header';
 import { BalanceRow } from './components/balance-row';
 import { OrderHeader } from './components/order-header';
 import { OrderRow } from './components/order-row';
-import { orders } from './data';
+import { matchedOrders, orders } from './data';
 import { Balance } from './types';
 
 const MyPage = () => {
   const currentBalances = useReadLocalStorage<Balance[]>(LOCALSTORAGE_KEYS.BALANCES) ?? [];
+  const [reveal, setReveal] = useState<boolean>(false);
 
   return (
     <Wrapper>
@@ -35,11 +37,12 @@ const MyPage = () => {
           <TableWrapper>
             <OrderHeader />
             <Divider />
-            {orders.map(({ id, ...rest }) => (
-              <OrderRow key={id} {...rest} />
-            ))}
+            {reveal
+              ? matchedOrders.map(({ id, ...rest }) => <OrderRow key={id} {...rest} />)
+              : orders.map(({ id, ...rest }) => <OrderRow key={id} {...rest} />)}
           </TableWrapper>
         </PositionWrapper>
+        <Refresh onClick={() => setReveal(true)}>{'Get Result'}</Refresh>
       </ContentWrapper>
     </Wrapper>
   );
@@ -68,5 +71,7 @@ const TableWrapper = tw.div`
 const Divider = tw.div`
   w-full h-1 flex-shrink-0 bg-gray4
 `;
-
+const Refresh = tw.button`
+  clickable bg-gray5 text-white h-40 font-sb-14
+`;
 export default MyPage;
