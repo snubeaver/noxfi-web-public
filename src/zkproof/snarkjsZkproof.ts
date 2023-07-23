@@ -1,4 +1,4 @@
-import { groth16 } from 'snarkjs';
+const { groth16 } = require('snarkjs');
 
 async function fetchFile(path: string) {
   const response = await fetch(path);
