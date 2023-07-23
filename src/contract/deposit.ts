@@ -21,20 +21,6 @@ export const useContractDeposit = ({ a, b, c, input }: depositParam) => {
     account: address,
     enabled: !!a && !!b && !!c && !!input,
     functionName: 'deposit',
-    cacheTime: 1000,
-    staleTime: 1000,
-    isDataEqual: false,
-    structuralSharing: false,
-    suspense: false,
-    onError: () => {
-      console.log('onError');
-    },
-    onSettled: () => {
-      console.log('onSettled');
-    },
-    onSuccess: () => {
-      console.log('onSuccess');
-    },
     chainId: DEFAULT_CHAIN_ID,
     args: [a, b, c, input],
     address: NOXFI_CONTRACT_ADDRESS,
@@ -46,20 +32,6 @@ export const useContractDeposit = ({ a, b, c, input }: depositParam) => {
   const { status, isSuccess, fetchStatus } = useWaitForTransaction({
     hash: data?.hash,
     enabled: !!data?.hash,
-    cacheTime: 1000,
-    staleTime: 1000,
-    isDataEqual: false,
-    structuralSharing: false,
-    suspense: false,
-    onError: () => {
-      console.log('onError');
-    },
-    onSettled: () => {
-      console.log('onSettled');
-    },
-    onSuccess: () => {
-      console.log('onSuccess');
-    },
   });
 
   return {
