@@ -23,13 +23,13 @@ export const useContractOrder = ({ a, b, c, input }: orderParam) => {
     fetchStatus: prepareFetchStatus,
     config,
   } = usePrepareContractWrite({
-    account: address,
-    enabled: true,
-    functionName: 'order',
     chainId: DEFAULT_CHAIN_ID,
-    args: [a, b, c, input],
     address: NOXFI_CONTRACT_ADDRESS,
     abi: noxfiABI,
+    functionName: 'order',
+    account: address,
+    args: [a, b, c, input],
+    enabled: !!a && !!b && !!c && !!input,
   });
 
   const { data, writeAsync } = useContractWrite(config);

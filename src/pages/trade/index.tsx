@@ -1,8 +1,9 @@
 import { InjectedConnector } from '@wagmi/core';
 import { useWeb3Modal } from '@web3modal/react';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import tw from 'twin.macro';
 import { useLocalStorage, useReadLocalStorage } from 'usehooks-ts';
+import { parseEther } from 'viem';
 import { useConnect } from 'wagmi';
 
 import { useReadLatestRoundDataEthDai } from '~/api/contracts-chainlink/read';
@@ -20,7 +21,7 @@ import { TRADE_OPTIONS } from '~/types';
 import { parseFloat, parseNumberWithComma } from '~/utils/number';
 import { orderCalldata } from '~/zkproof/order/snarkjsOrder';
 
-import { Order } from '../my/types';
+import { Order, ORDER_STATUS } from '../my/types';
 
 const TradePage = () => {
   const { isConnected } = useConnectWallet();
@@ -36,16 +37,12 @@ const TradePage = () => {
   const [proofC, setProofC] = useState<string[]>();
   const [tradeInput, setTradeInput] = useState<string[]>();
 
-  const [amount, setAmount] = useState<number | string>('');
-
-  const currentBalance = useReadLocalStorage<Order[]>(LOCALSTORAGE_KEYS.ORDERS);
-  const [order, setOrder] = useLocalStorage<Order[]>(
-    LOCALSTORAGE_KEYS.ORDERS,
-    currentBalance ?? []
-  );
+  const currentOrders = useReadLocalStorage<Order[]>(LOCALSTORAGE_KEYS.ORDERS);
+  const [order, setOrder] = useLocalStorage<Order[]>(LOCALSTORAGE_KEYS.ORDERS, currentOrders ?? []);
 
   const { data: ethDaiData } = useReadLatestRoundDataEthDai({ staleTime: Infinity });
 
+  const [amount, setAmount] = useState<number | string>('');
   const [price, setPrice] = useState<number | string>('');
   const [calculatedAmount, setCalculatedAmount] = useState<number | string>('');
 
@@ -83,7 +80,6 @@ const TradePage = () => {
     c: proofC,
     input: tradeInput,
   });
-  console.log(data);
 
   const callTradeData = async () => {
     if (!isConnected || !amount || amount === 0) {
@@ -129,26 +125,31 @@ const TradePage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderAsync]);
 
-  // useEffect(() => {
-  // {
-  // hash: '0x0c4f48a85138eda2cdf1564f8783c3012117dd6bf245a00be49fb924c8c028ce';
-  // }
-  //   if (data && data.hash) {
-  //     const addedBalance = balance.concat({
-  //       id: Date.now(),
-  //       note: data.hash,
-  //       noteHidden: true,
-  //       balance: {
-  //         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  //         amount: parseEther(amount.toString()).toString() as any,
-  //         decimalPoints: 18,
-  //         tokenTicker: selected,
-  //       },
-  //     });
-  //     setBalance(addedBalance);
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [data]);
+  useEffect(() => {
+    if (data && data.hash) {
+      const addedOrder = order.concat({
+        id: Date.now(),
+        note: data.hash,
+        noteHidden: true,
+        from: {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          amount: parseEther(amount.toString()).toString() as any,
+          decimalPoints: 18,
+          tokenTicker: selected.split('_')[0] as string,
+        },
+        to: {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          amount: parseEther(calculatedAmount.toString()).toString() as any,
+          decimalPoints: 18,
+          tokenTicker: selected.split('_')[1] as string,
+        },
+        status: ORDER_STATUS.ORDERED,
+      });
+
+      setOrder(addedOrder);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
 
   useEffect(() => {
     const amountNum = Number(amount || 0);

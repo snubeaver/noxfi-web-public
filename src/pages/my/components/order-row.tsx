@@ -18,13 +18,13 @@ export const OrderRow = ({ note, noteHidden, from, to, status, ...rest }: Props)
   const [shown, show] = useState(noteHidden);
   const toggle = () => show(!shown);
 
-  const parsedFromToken = Number(parseFloat(Number(formatEther(fromAmount)), 4));
+  const parsedFromToken = Number(parseFloat(Number(formatEther(BigInt(fromAmount))), 4));
   const parsedFromAmount =
     parsedFromToken > 1000000
       ? parseNumberWithUnit(parsedFromToken)
       : parseNumberWithComma(parsedFromToken);
 
-  const parsedToToken = Number(parseFloat(Number(formatEther(toAmount)), 4));
+  const parsedToToken = Number(parseFloat(Number(formatEther(BigInt(toAmount))), 4));
   const parsedToAmount =
     parsedToToken > 1000000
       ? parseNumberWithUnit(parsedToToken)
@@ -75,7 +75,7 @@ const NoteWrapper = tw.div`
   flex-center gap-4 flex-shrink-0 w-200
 `;
 const Note = tw.div`
-  flex font-r-14 text-white
+  flex font-r-14 text-white overflow-auto scrollbar-hide
 `;
 const HideWrapper = tw.div`
   flex-center flex-shrink-0 clickable

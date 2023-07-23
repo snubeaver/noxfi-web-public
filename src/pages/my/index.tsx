@@ -9,11 +9,13 @@ import { BalanceHeader } from './components/balance-header';
 import { BalanceRow } from './components/balance-row';
 import { OrderHeader } from './components/order-header';
 import { OrderRow } from './components/order-row';
-import { matchedOrders, orders } from './data';
-import { Balance, ORDER_STATUS } from './types';
+import { matchedOrders } from './data';
+import { Balance, Order, ORDER_STATUS } from './types';
 
 const MyPage = () => {
   const currentBalances = useReadLocalStorage<Balance[]>(LOCALSTORAGE_KEYS.BALANCES) ?? [];
+  const currentOrders = useReadLocalStorage<Order[]>(LOCALSTORAGE_KEYS.ORDERS) ?? [];
+
   const [reveal, setReveal] = useState<boolean>(false);
 
   return (
@@ -45,7 +47,7 @@ const MyPage = () => {
                     status={status ? ORDER_STATUS.MATCHED : ORDER_STATUS.MATCHED}
                   />
                 ))
-              : orders.map(({ id, ...rest }) => <OrderRow key={id} {...rest} />)}
+              : currentOrders.map(({ id, ...rest }) => <OrderRow key={id} {...rest} />)}
           </TableWrapper>
         </PositionWrapper>
         <Refresh onClick={() => setReveal(true)}>{'Get Result'}</Refresh>
