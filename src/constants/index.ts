@@ -10,8 +10,9 @@ export const IS_MAINNET = false; // demo will be on testnet
 export const CHAIN_ID = {
   ETH: 1,
   GOERLI: 5,
+  ZKEVM_TESTNET: 1442,
 };
-export const DEFAULT_CHAIN_ID = CHAIN_ID.GOERLI; // for test
+export const DEFAULT_CHAIN_ID = CHAIN_ID.ZKEVM_TESTNET; // for test
 
 // wallet connect project id
 export const WALLETCONNECT_PROJECT_ID = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID;
@@ -23,3 +24,4 @@ export const CONTRACT_ADDRESS: Record<string, `0x${string}`> = {
 };
 
 export const API_URL = IS_LOCAL ? 'http://localhost:8080' : 'https://api.nox.finance';
+export const NOXFI_CONTRACT_ADDRESS = '0x';
