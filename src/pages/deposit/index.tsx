@@ -1,6 +1,6 @@
 import { InjectedConnector } from '@wagmi/core';
 import { useWeb3Modal } from '@web3modal/react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import tw from 'twin.macro';
 import { useConnect } from 'wagmi';
 
@@ -8,7 +8,7 @@ import { ButtonLarge } from '~/components/buttons';
 import { Gnb } from '~/components/gnb';
 import { TextField } from '~/components/textfield';
 import { Toggle } from '~/components/toggle';
-import { useAllowance, useTokenApprove } from '~/contract/approve';
+import { useTokenApprove } from '~/contract/approve';
 import { useContractDeposit } from '~/contract/deposit';
 import { useConnectWallet } from '~/hooks/data/use-connect-wallet';
 import { useDepositState } from '~/states/data/deposit';
@@ -21,29 +21,18 @@ const DepositPage = () => {
   const { connect } = useConnect({
     connector: new InjectedConnector(),
   });
+
   const { selected, select } = useDepositState();
   const { isOpen, open } = useWeb3Modal();
+
   const [proofA, setProofA] = useState<string[]>();
   const [proofB, setProofB] = useState<string[][]>();
   const [proofC, setProofC] = useState<string[]>();
   const [depositInput, setDepositInput] = useState<string[]>();
 
-  const {
-    allowanceAmount,
-    refetch: allowanceRefetch,
-    isFetching: isAllowanceLoading,
-  } = useAllowance();
+  const [amount, setAmount] = useState<number | string>('');
 
-  const allowance = useMemo(
-    () => isConnected && allowanceAmount > 0,
-    [isConnected, allowanceAmount]
-  );
-
-  const {
-    writeAsync: approveAsync,
-    isLoading: isApproveLoading,
-    isSuccess: approveSuccess,
-  } = useTokenApprove();
+  const { allowance, writeAsync: approveAsync, isLoading: isApproveLoading } = useTokenApprove();
 
   const handleApprove = useCallback(async () => {
     if (isApproveLoading) return;
@@ -54,22 +43,19 @@ const DepositPage = () => {
     await approveAsync?.();
   }, [approveAsync, connect, isApproveLoading, isConnected]);
 
-  const { writeAsync: depositAsync, isLoading: isDepositLoading } = useContractDeposit({
+  const {
+    data,
+    writeAsync: depositAsync,
+    isLoading: isDepositLoading,
+  } = useContractDeposit({
     a: proofA,
     b: proofB,
     c: proofC,
     input: depositInput,
   });
 
-  const handleDeposit = async () => {
+  const callDepositData = async () => {
     if (!isConnected || !amount || amount === 0) {
-      return;
-    }
-    calculateProof();
-  };
-
-  const calculateProof = async () => {
-    if (!amount || amount === 0) {
       return;
     }
 
@@ -86,39 +72,38 @@ const DepositPage = () => {
     if (!calldata) {
       return 'Invalid inputs to generate witness.';
     }
-    console.log('calldata', calldata);
 
     setProofA(calldata.a);
     setProofB(calldata.b);
     setProofC(calldata.c);
     setDepositInput(calldata.Input);
-
-    handleDepositContract();
   };
 
-  const handleDepositContract = useCallback(async () => {
-    if (isDepositLoading) return;
-    if (!isConnected) {
-      connect();
-      return;
-    }
+  const handleDepositContract = async () => {
+    if (isDepositLoading || !isConnected) return;
+
     try {
       const result = await depositAsync?.();
-      console.log('result', result);
       if (result) {
         alert('Successfully deposit verified');
       }
     } catch (error) {
-      console.log(error);
       alert('deposit verifying failed');
     }
-  }, [connect, depositAsync, isConnected, isDepositLoading]);
-
-  const [amount, setAmount] = useState<number | string>('');
+  };
 
   useEffect(() => {
-    allowanceRefetch();
-  }, [approveSuccess, allowanceRefetch]);
+    handleDepositContract();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [depositAsync]);
+
+  useEffect(() => {
+    if (data && data.hash) {
+      // {
+      //   hash: '0xbbb167f5d260654da1902bf10a58d5a4b33519b04589c94f96d288eec526e417';
+      // }
+    }
+  }, [data]);
 
   useEffect(() => {
     setAmount('');
@@ -153,7 +138,7 @@ const DepositPage = () => {
           !allowance ? (
             <ButtonLarge text="Approve" onClick={handleApprove} />
           ) : (
-            <ButtonLarge text="Deposit" onClick={handleDeposit} />
+            <ButtonLarge text="Deposit" isLoading={isDepositLoading} onClick={callDepositData} />
           )
         ) : (
           <ButtonLarge text="Connect Wallet" isLoading={isOpen} onClick={open} />
