@@ -51,7 +51,15 @@ export const OrderRow = ({ note, noteHidden, from, to, status, ...rest }: Props)
       </BalanceWrapper>
       <StatusWrapper>
         <StatusText status={status}>{upperFirst(status.toLowerCase())}</StatusText>
-        {status === ORDER_STATUS.MATCHED && <ButtonSmall text="Claim" style={{ width: '72px' }} />}
+        {status === ORDER_STATUS.MATCHED && (
+          <ButtonSmall
+            text="Claim"
+            style={{ width: '72px' }}
+            onClick={() => {
+              alert('successfully claim matched balance');
+            }}
+          />
+        )}
         {status === ORDER_STATUS.CANCELED && (
           <ButtonSmall text="Refund" style={{ width: '72px' }} />
         )}

@@ -8,7 +8,7 @@ export const balances: Balance[] = [
     note: 'test note',
     noteHidden: true,
     balance: {
-      amount: parseEther('123456'),
+      amount: parseEther('10'),
       tokenTicker: 'ETH',
       decimalPoints: 18,
     },

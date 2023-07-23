@@ -24,4 +24,7 @@ export const CONTRACT_ADDRESS: Record<string, `0x${string}`> = {
 };
 
 export const API_URL = IS_LOCAL ? 'http://localhost:8080' : 'https://api.nox.finance';
-export const NOXFI_CONTRACT_ADDRESS = '0x';
+export const NOXFI_CONTRACT_ADDRESS = '0x954648A63eBC8be4717c08Bf229C988226fC8A50';
+export const DAI = '0x8D4137163E0679f94ED07D45152F229e46fc3a4c';
+export const WETH = '0xd36115B12E7408F8142F8451CE97CEB2E14ab2FF';
+export const MATCHER = '0xD5D56F27A592F2E9A008647eeAa390cc353dfc36';

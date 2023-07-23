@@ -36,7 +36,12 @@ export const BalanceRow = ({ note, noteHidden, balance, ...rest }: Props) => {
       </NoteWrapper>
       <BalanceWrapper>{`${parsedAmount} ${tokenTicker.toUpperCase()}`}</BalanceWrapper>
       <ButtonWrapper>
-        <ButtonSmall text="Withdraw" />
+        <ButtonSmall
+          text="Withdraw"
+          onClick={() => {
+            alert('successfully withdraw balance ');
+          }}
+        />
       </ButtonWrapper>
     </Wrapper>
   );
