@@ -10,7 +10,7 @@ import { BalanceRow } from './components/balance-row';
 import { OrderHeader } from './components/order-header';
 import { OrderRow } from './components/order-row';
 import { matchedOrders, orders } from './data';
-import { Balance } from './types';
+import { Balance, ORDER_STATUS } from './types';
 
 const MyPage = () => {
   const currentBalances = useReadLocalStorage<Balance[]>(LOCALSTORAGE_KEYS.BALANCES) ?? [];
@@ -38,7 +38,13 @@ const MyPage = () => {
             <OrderHeader />
             <Divider />
             {reveal
-              ? matchedOrders.map(({ id, ...rest }) => <OrderRow key={id} {...rest} />)
+              ? matchedOrders.map(({ id, status, ...rest }) => (
+                  <OrderRow
+                    key={id}
+                    {...rest}
+                    status={status ? ORDER_STATUS.MATCHED : ORDER_STATUS.MATCHED}
+                  />
+                ))
               : orders.map(({ id, ...rest }) => <OrderRow key={id} {...rest} />)}
           </TableWrapper>
         </PositionWrapper>
