@@ -3,6 +3,7 @@ import { useWeb3Modal } from '@web3modal/react';
 import { useCallback, useEffect, useState } from 'react';
 import tw from 'twin.macro';
 import { useLocalStorage, useReadLocalStorage } from 'usehooks-ts';
+import { parseEther } from 'viem';
 import { useConnect } from 'wagmi';
 
 import { ButtonLarge } from '~/components/buttons';
@@ -113,7 +114,8 @@ const DepositPage = () => {
         note: data.hash,
         noteHidden: true,
         balance: {
-          amount: BigInt(amount),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          amount: parseEther(amount.toString()).toString() as any,
           decimalPoints: 18,
           tokenTicker: selected,
         },
