@@ -22,7 +22,6 @@ const DepositPage = () => {
   });
   const { selected, select } = useDepositState();
   const { isOpen, open } = useWeb3Modal();
-  const [amount, setAmount] = useState<number | undefined>();
   const [proofA, setProofA] = useState<string[]>();
   const [proofB, setProofB] = useState<string[][]>();
   const [proofC, setProofC] = useState<string[]>();
@@ -54,7 +53,7 @@ const DepositPage = () => {
 
     const calldata = await depositCalldata(
       salt,
-      Math.floor(amount).toString(),
+      Math.floor(Number(amount)).toString(),
       selected === DEPOSIT_OPTIONS.DAI ? '0' : '1'
     );
     if (!calldata) {
@@ -87,12 +86,6 @@ const DepositPage = () => {
   useEffect(() => {
     handleDepositContract();
   }, [depositAsync, handleDepositContract, proofA, proofB, proofC, depositInput]);
-
-  useEffect(() => {
-    if (amount) {
-      console.log(amount);
-    }
-  }, [amount]);
 
   const [amount, setAmount] = useState<number | string>('');
 
