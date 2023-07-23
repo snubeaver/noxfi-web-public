@@ -3,17 +3,13 @@ import { formatEther } from 'viem';
 
 import { aggregatorV3InterfaceABI } from '~/abi/chainlink';
 import { publicClient } from '~/configs/setup-provider';
-import { CHAINLINK_RATE_ADDRESS } from '~/constants';
+import { CONTRACT_ADDRESS } from '~/constants';
 
-interface ReadLatestRoundDataEthDaiResponse {
-  ethDai: number;
-  daiEth: number;
-  startedAt: Date;
-  updatedAt: Date;
-}
+import { ReadLatestRoundDataEthDaiResponse } from './read-interfaces';
+
 const readLatestRoundDataEthDai = () =>
   publicClient.readContract({
-    address: CHAINLINK_RATE_ADDRESS.ETH_DAI,
+    address: CONTRACT_ADDRESS.CHAINLINK_ETH_DAI,
     abi: aggregatorV3InterfaceABI,
     functionName: 'latestRoundData',
   });
