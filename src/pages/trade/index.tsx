@@ -1,6 +1,8 @@
+import { InjectedConnector } from '@wagmi/core';
 import { useWeb3Modal } from '@web3modal/react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import tw from 'twin.macro';
+import { useConnect } from 'wagmi';
 
 import { useReadLatestRoundDataEthDai } from '~/api/contracts-chainlink/read';
 import { ButtonLarge } from '~/components/buttons';
@@ -8,13 +10,18 @@ import { Gnb } from '~/components/gnb';
 import { IconNext } from '~/components/icons';
 import { TextField } from '~/components/textfield';
 import { Toggle } from '~/components/toggle';
+import { useContractOrder } from '~/contract/order';
 import { useConnectWallet } from '~/hooks/data/use-connect-wallet';
 import { useTradeState } from '~/states/data/trade';
 import { TRADE_OPTIONS } from '~/types';
 import { parseFloat, parseNumberWithComma } from '~/utils/number';
+import { orderCalldata } from '~/zkproof/order/snarkjsOrder';
 
 const TradePage = () => {
   const { isConnected } = useConnectWallet();
+  const { connect } = useConnect({
+    connector: new InjectedConnector(),
+  });
   const { selected, select } = useTradeState();
   const { isOpen, open } = useWeb3Modal();
 
@@ -36,6 +43,71 @@ const TradePage = () => {
   const currentPriceUnit = selected === TRADE_OPTIONS.DAI_ETH ? 'DAI/ETH' : 'ETH/DAI';
   const fromUnit = selected === TRADE_OPTIONS.DAI_ETH ? 'DAI' : 'ETH';
   const toUnit = selected === TRADE_OPTIONS.DAI_ETH ? 'ETH' : 'DAI';
+  const [proofA, setProofA] = useState<string[]>();
+  const [proofB, setProofB] = useState<string[][]>();
+  const [proofC, setProofC] = useState<string[]>();
+  const [tradeInput, setTradeInput] = useState<string[]>();
+
+  const handleTrade = async () => {
+    if (!isConnected || !amount || amount === 0) {
+      return;
+    }
+    calculateProof();
+  };
+
+  const calculateProof = async () => {
+    if (!amount || amount === 0) {
+      return;
+    }
+
+    const salt = Array.from({ length: 30 }, () => Math.floor(Math.random() * 10)).reduce(
+      (acc, curr) => acc + curr.toString(),
+      ''
+    );
+
+    const calldata = await orderCalldata(
+      salt,
+      Math.floor(Number(amount)).toString(),
+      selected === TRADE_OPTIONS.ETH_DAI ? '1' : '0',
+      price.toString()
+    );
+    if (!calldata) {
+      return 'Invalid inputs to generate witness.';
+    }
+    console.log('calldata', calldata);
+
+    setProofA(calldata.a);
+    setProofB(calldata.b);
+    setProofC(calldata.c);
+    setTradeInput(calldata.Input);
+
+    handleTradeContract();
+  };
+
+  const { writeAsync: orderAsync, isLoading: isTradeLoading } = useContractOrder({
+    a: proofA,
+    b: proofB,
+    c: proofC,
+    input: tradeInput,
+  });
+
+  const handleTradeContract = useCallback(async () => {
+    if (isTradeLoading) return;
+    if (!isConnected) {
+      connect();
+      return;
+    }
+    try {
+      const result = await orderAsync?.();
+      console.log('result', result);
+      if (result) {
+        alert('Successfully order verified');
+      }
+    } catch (error) {
+      console.log(error);
+      alert('order verifying failed');
+    }
+  }, [connect, orderAsync, isConnected, isTradeLoading]);
 
   useEffect(() => {
     const amountNum = Number(amount || 0);
@@ -44,7 +116,7 @@ const TradePage = () => {
       setCalculatedAmount('');
       return;
     }
-    setCalculatedAmount(Number(parseFloat(amountNum * price, 8)));
+    setCalculatedAmount(Number(parseFloat(amountNum * Number(price), 8)));
   }, [amount, price]);
 
   useEffect(() => {
@@ -104,7 +176,7 @@ const TradePage = () => {
           <ButtonLarge
             text="Trade"
             onClick={() => {
-              alert('Successfully submit order');
+              handleTrade();
             }}
           />
         ) : (
