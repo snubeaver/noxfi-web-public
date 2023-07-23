@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import {
   useAccount,
   useContractWrite,
@@ -28,12 +27,7 @@ export const useContractOrder = ({ a, b, c, input }: orderParam) => {
     enabled: true,
     functionName: 'order',
     chainId: DEFAULT_CHAIN_ID,
-    args: [
-      a?.map(v => BigNumber.from(v)),
-      b?.map(v => v.map(x => BigNumber.from(x))),
-      c?.map(v => BigNumber.from(v)),
-      input?.map(v => BigNumber.from(v)),
-    ],
+    args: [a, b, c, input],
     address: NOXFI_CONTRACT_ADDRESS,
     abi: noxfiABI,
   });

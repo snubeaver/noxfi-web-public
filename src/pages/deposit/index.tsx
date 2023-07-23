@@ -44,14 +44,14 @@ const DepositPage = () => {
 
   const { allowance, writeAsync: approveAsync, isLoading: isApproveLoading } = useTokenApprove();
 
-  const handleApprove = useCallback(async () => {
+  const handleApprove = async () => {
     if (isApproveLoading) return;
     if (!isConnected) {
       connect();
       return;
     }
     await approveAsync?.();
-  }, [approveAsync, connect, isApproveLoading, isConnected]);
+  };
 
   const {
     data,

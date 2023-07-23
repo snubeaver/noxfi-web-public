@@ -2,6 +2,7 @@ import { InjectedConnector } from '@wagmi/core';
 import { useWeb3Modal } from '@web3modal/react';
 import { useCallback, useEffect, useState } from 'react';
 import tw from 'twin.macro';
+import { useLocalStorage, useReadLocalStorage } from 'usehooks-ts';
 import { useConnect } from 'wagmi';
 
 import { useReadLatestRoundDataEthDai } from '~/api/contracts-chainlink/read';
@@ -10,6 +11,8 @@ import { Gnb } from '~/components/gnb';
 import { IconNext } from '~/components/icons';
 import { TextField } from '~/components/textfield';
 import { Toggle } from '~/components/toggle';
+import { LOCALSTORAGE_KEYS } from '~/constants';
+import { useTokenApprove } from '~/contract/approve';
 import { useContractOrder } from '~/contract/order';
 import { useConnectWallet } from '~/hooks/data/use-connect-wallet';
 import { useTradeState } from '~/states/data/trade';
@@ -17,22 +20,39 @@ import { TRADE_OPTIONS } from '~/types';
 import { parseFloat, parseNumberWithComma } from '~/utils/number';
 import { orderCalldata } from '~/zkproof/order/snarkjsOrder';
 
+import { Order } from '../my/types';
+
 const TradePage = () => {
   const { isConnected } = useConnectWallet();
   const { connect } = useConnect({
     connector: new InjectedConnector(),
   });
+
   const { selected, select } = useTradeState();
   const { isOpen, open } = useWeb3Modal();
 
-  const { data } = useReadLatestRoundDataEthDai({ staleTime: Infinity });
+  const [proofA, setProofA] = useState<string[]>();
+  const [proofB, setProofB] = useState<string[][]>();
+  const [proofC, setProofC] = useState<string[]>();
+  const [tradeInput, setTradeInput] = useState<string[]>();
 
   const [amount, setAmount] = useState<number | string>('');
+
+  const currentBalance = useReadLocalStorage<Order[]>(LOCALSTORAGE_KEYS.ORDERS);
+  const [order, setOrder] = useLocalStorage<Order[]>(
+    LOCALSTORAGE_KEYS.ORDERS,
+    currentBalance ?? []
+  );
+
+  const { data: ethDaiData } = useReadLatestRoundDataEthDai({ staleTime: Infinity });
+
   const [price, setPrice] = useState<number | string>('');
   const [calculatedAmount, setCalculatedAmount] = useState<number | string>('');
 
-  const currentEthDaiPrice = data?.ethDai ?? 0;
-  const currentDaiEthPrice = data?.daiEth ?? 0;
+  const { allowance, writeAsync: approveAsync, isLoading: isApproveLoading } = useTokenApprove();
+
+  const currentEthDaiPrice = ethDaiData?.ethDai ?? 0;
+  const currentDaiEthPrice = ethDaiData?.daiEth ?? 0;
 
   const currentPrice = selected === TRADE_OPTIONS.DAI_ETH ? currentDaiEthPrice : currentEthDaiPrice;
   const parsedCurrentPrice =
@@ -43,20 +63,30 @@ const TradePage = () => {
   const currentPriceUnit = selected === TRADE_OPTIONS.DAI_ETH ? 'DAI/ETH' : 'ETH/DAI';
   const fromUnit = selected === TRADE_OPTIONS.DAI_ETH ? 'DAI' : 'ETH';
   const toUnit = selected === TRADE_OPTIONS.DAI_ETH ? 'ETH' : 'DAI';
-  const [proofA, setProofA] = useState<string[]>();
-  const [proofB, setProofB] = useState<string[][]>();
-  const [proofC, setProofC] = useState<string[]>();
-  const [tradeInput, setTradeInput] = useState<string[]>();
 
-  const handleTrade = async () => {
-    if (!isConnected || !amount || amount === 0) {
+  const handleApprove = async () => {
+    if (isApproveLoading) return;
+    if (!isConnected) {
+      connect();
       return;
     }
-    calculateProof();
+    await approveAsync?.();
   };
 
-  const calculateProof = async () => {
-    if (!amount || amount === 0) {
+  const {
+    data,
+    writeAsync: orderAsync,
+    isLoading: isTradeLoading,
+  } = useContractOrder({
+    a: proofA,
+    b: proofB,
+    c: proofC,
+    input: tradeInput,
+  });
+  console.log(data);
+
+  const callTradeData = async () => {
+    if (!isConnected || !amount || amount === 0) {
       return;
     }
 
@@ -74,40 +104,51 @@ const TradePage = () => {
     if (!calldata) {
       return 'Invalid inputs to generate witness.';
     }
-    console.log('calldata', calldata);
 
     setProofA(calldata.a);
     setProofB(calldata.b);
     setProofC(calldata.c);
     setTradeInput(calldata.Input);
-
-    handleTradeContract();
   };
 
-  const { writeAsync: orderAsync, isLoading: isTradeLoading } = useContractOrder({
-    a: proofA,
-    b: proofB,
-    c: proofC,
-    input: tradeInput,
-  });
+  const handleTradeContract = async () => {
+    if (isTradeLoading || !isConnected) return;
 
-  const handleTradeContract = useCallback(async () => {
-    if (isTradeLoading) return;
-    if (!isConnected) {
-      connect();
-      return;
-    }
     try {
       const result = await orderAsync?.();
-      console.log('result', result);
       if (result) {
         alert('Successfully order verified');
       }
     } catch (error) {
-      console.log(error);
       alert('order verifying failed');
     }
-  }, [connect, orderAsync, isConnected, isTradeLoading]);
+  };
+
+  useEffect(() => {
+    handleTradeContract();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orderAsync]);
+
+  // useEffect(() => {
+  // {
+  // hash: '0x0c4f48a85138eda2cdf1564f8783c3012117dd6bf245a00be49fb924c8c028ce';
+  // }
+  //   if (data && data.hash) {
+  //     const addedBalance = balance.concat({
+  //       id: Date.now(),
+  //       note: data.hash,
+  //       noteHidden: true,
+  //       balance: {
+  //         // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  //         amount: parseEther(amount.toString()).toString() as any,
+  //         decimalPoints: 18,
+  //         tokenTicker: selected,
+  //       },
+  //     });
+  //     setBalance(addedBalance);
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [data]);
 
   useEffect(() => {
     const amountNum = Number(amount || 0);
@@ -173,12 +214,11 @@ const TradePage = () => {
           </TradeInputWrapper>
         </TradeWrapper>
         {isConnected ? (
-          <ButtonLarge
-            text="Trade"
-            onClick={() => {
-              handleTrade();
-            }}
-          />
+          !allowance ? (
+            <ButtonLarge text="Approve" onClick={handleApprove} />
+          ) : (
+            <ButtonLarge text="Trade" isLoading={isTradeLoading} onClick={callTradeData} />
+          )
         ) : (
           <ButtonLarge text="Connect Wallet" isLoading={isOpen} onClick={open} />
         )}
