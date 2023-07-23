@@ -17,13 +17,9 @@ export const DEFAULT_CHAIN_ID = CHAIN_ID.GOERLI; // for test
 export const WALLETCONNECT_PROJECT_ID = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID;
 
 export const CONTRACT_ADDRESS: Record<string, `0x${string}`> = {
-  DAI: IS_MAINNET
-    ? '0xdc31Ee1784292379Fbb2964b3B9C4124D8F89C60'
-    : '0xdc31Ee1784292379Fbb2964b3B9C4124D8F89C60',
-};
-
-export const CHAINLINK_RATE_ADDRESS: Record<string, `0x${string}`> = {
-  ETH_DAI: IS_MAINNET
+  CHAINLINK_ETH_DAI: IS_MAINNET
     ? '0x773616e4d11a78f511299002da57a0a94577f1f4'
     : '0x773616e4d11a78f511299002da57a0a94577f1f4',
 };
+
+export const API_URL = IS_LOCAL ? 'http://localhost:8080' : 'https://api.nox.finance';

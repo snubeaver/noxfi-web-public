@@ -2,12 +2,12 @@ import { useWeb3Modal } from '@web3modal/react';
 import { useEffect, useState } from 'react';
 import tw from 'twin.macro';
 
+import { useReadLatestRoundDataEthDai } from '~/api/contracts-chainlink/read';
 import { ButtonLarge } from '~/components/buttons';
 import { Gnb } from '~/components/gnb';
 import { IconNext } from '~/components/icons';
 import { TextField } from '~/components/textfield';
 import { Toggle } from '~/components/toggle';
-import { useReadLatestRoundDataEthDai } from '~/contracts/chainlink-read';
 import { useConnectWallet } from '~/hooks/data/use-connect-wallet';
 import { useTradeState } from '~/states/data/trade';
 import { TRADE_OPTIONS } from '~/types';
