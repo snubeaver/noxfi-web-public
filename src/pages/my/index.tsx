@@ -1,6 +1,5 @@
-import { useState } from 'react';
 import tw from 'twin.macro';
-import { useReadLocalStorage } from 'usehooks-ts';
+import { useLocalStorage, useReadLocalStorage } from 'usehooks-ts';
 
 import { Gnb } from '~/components/gnb';
 import { LOCALSTORAGE_KEYS } from '~/constants';
@@ -9,14 +8,38 @@ import { BalanceHeader } from './components/balance-header';
 import { BalanceRow } from './components/balance-row';
 import { OrderHeader } from './components/order-header';
 import { OrderRow } from './components/order-row';
-import { matchedOrders } from './data';
 import { Balance, Order, ORDER_STATUS } from './types';
 
 const MyPage = () => {
   const currentBalances = useReadLocalStorage<Balance[]>(LOCALSTORAGE_KEYS.BALANCES) ?? [];
   const currentOrders = useReadLocalStorage<Order[]>(LOCALSTORAGE_KEYS.ORDERS) ?? [];
+  const [orders, setOrders] = useLocalStorage<Order[]>(LOCALSTORAGE_KEYS.ORDERS, currentOrders);
 
-  const [reveal, setReveal] = useState<boolean>(false);
+  const handleReveal = () => {
+    const length = orders.length;
+    if (length === 0) return;
+
+    if (length === 1) {
+      setOrders([
+        {
+          ...currentOrders[0],
+          status: ORDER_STATUS.MATCHED,
+        },
+      ]);
+      return;
+    }
+
+    // 2개 이상일때 하나만 canceled
+    const randomIdx = Math.floor(Math.random() * orders.length);
+    const newOrders = orders.map((order, idx) => {
+      if (idx === randomIdx) {
+        return { ...order, status: ORDER_STATUS.CANCELED };
+      }
+      return { ...order, status: ORDER_STATUS.MATCHED };
+    });
+
+    setOrders(newOrders);
+  };
 
   return (
     <Wrapper>
@@ -39,18 +62,12 @@ const MyPage = () => {
           <TableWrapper>
             <OrderHeader />
             <Divider />
-            {reveal
-              ? matchedOrders.map(({ id, status, ...rest }) => (
-                  <OrderRow
-                    key={id}
-                    {...rest}
-                    status={status ? ORDER_STATUS.MATCHED : ORDER_STATUS.MATCHED}
-                  />
-                ))
-              : currentOrders.map(({ id, ...rest }) => <OrderRow key={id} {...rest} />)}
+            {orders.map(({ id, ...rest }) => (
+              <OrderRow key={id} {...rest} />
+            ))}
           </TableWrapper>
         </PositionWrapper>
-        <Refresh onClick={() => setReveal(true)}>{'Get Result'}</Refresh>
+        <Refresh onClick={() => handleReveal()}>{'Get Result'}</Refresh>
       </ContentWrapper>
     </Wrapper>
   );
