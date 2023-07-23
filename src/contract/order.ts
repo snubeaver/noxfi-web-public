@@ -18,9 +18,12 @@ interface orderParam {
 export const useContractOrder = ({ a, b, c, input }: orderParam) => {
   const { address } = useAccount();
 
-  // console.log(a, b, c, input);
-
-  const { config } = usePrepareContractWrite({
+  const {
+    isLoading: prepareLoading,
+    status: prepareStatus,
+    fetchStatus: prepareFetchStatus,
+    config,
+  } = usePrepareContractWrite({
     account: address,
     enabled: true,
     functionName: 'order',
@@ -37,13 +40,19 @@ export const useContractOrder = ({ a, b, c, input }: orderParam) => {
 
   const { data, writeAsync } = useContractWrite(config);
 
-  const { status, isSuccess, fetchStatus } = useWaitForTransaction({
+  const { isLoading, status, isSuccess, fetchStatus } = useWaitForTransaction({
     hash: data?.hash,
     enabled: !!data?.hash,
   });
 
   return {
-    isLoading: fetchStatus === 'fetching' && status === 'loading',
+    isLoading:
+      prepareLoading ||
+      prepareFetchStatus === 'fetching' ||
+      prepareStatus === 'loading' ||
+      isLoading ||
+      fetchStatus === 'fetching' ||
+      status === 'loading',
     isSuccess,
     data,
     writeAsync,
