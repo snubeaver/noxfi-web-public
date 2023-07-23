@@ -151,7 +151,7 @@ const DepositPage = () => {
         </DepositWrapper>
         {isConnected ? (
           !allowance ? (
-            <ButtonLarge text="Deposit" onClick={handleDeposit} />
+            <ButtonLarge text="Approve" onClick={handleApprove} />
           ) : (
             <ButtonLarge text="Deposit" onClick={handleDeposit} />
           )
