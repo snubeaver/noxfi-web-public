@@ -7,17 +7,18 @@ export async function depositCalldata(salt: string, amount: string, asset: strin
     asset: asset,
   };
 
-  let dataResult;
-
   try {
-    dataResult = await exportCallDataGroth16(
-      input,
-      '/zkproof/deposit.wasm',
-      '/zkproof/deposit_final.zkey'
-    );
+    const dataResult: {
+      a: string[];
+      b: string[][];
+      c: string[];
+      Input: string[];
+    } = await exportCallDataGroth16(input, '/zkproof/deposit.wasm', '/zkproof/deposit_final.zkey');
+
+    return dataResult;
   } catch (error) {
     console.log(error);
   }
 
-  return dataResult;
+  return null;
 }

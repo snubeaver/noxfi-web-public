@@ -1,11 +1,14 @@
+import { InjectedConnector } from '@wagmi/core';
 import { useWeb3Modal } from '@web3modal/react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import tw from 'twin.macro';
+import { useConnect } from 'wagmi';
 
 import { ButtonLarge } from '~/components/buttons';
 import { Gnb } from '~/components/gnb';
 import { TextField } from '~/components/textfield';
 import { Toggle } from '~/components/toggle';
+import { useContractDeposit } from '~/contract/deposit';
 import { useConnectWallet } from '~/hooks/data/use-connect-wallet';
 import { useDepositState } from '~/states/data/deposit';
 import { DEPOSIT_OPTIONS } from '~/types';
@@ -14,9 +17,23 @@ import { depositCalldata } from '../../zkproof/deposit/snarkjsDeposit';
 
 const DepositPage = () => {
   const { isConnected } = useConnectWallet();
+  const { connect } = useConnect({
+    connector: new InjectedConnector(),
+  });
   const { selected, select } = useDepositState();
   const { isOpen, open } = useWeb3Modal();
   const [amount, setAmount] = useState<number | undefined>();
+  const [proofA, setProofA] = useState<string[]>();
+  const [proofB, setProofB] = useState<string[][]>();
+  const [proofC, setProofC] = useState<string[]>();
+  const [depositInput, setDepositInput] = useState<string[]>();
+
+  const { writeAsync: depositAsync, isLoading: isDepositLoading } = useContractDeposit({
+    a: proofA,
+    b: proofB,
+    c: proofC,
+    input: depositInput,
+  });
 
   const handleDeposit = async () => {
     if (!isConnected || !amount || amount === 0) {
@@ -30,47 +47,46 @@ const DepositPage = () => {
       return;
     }
 
-    const salt = '11';
+    const salt = Array.from({ length: 30 }, () => Math.floor(Math.random() * 10)).reduce(
+      (acc, curr) => acc + curr.toString(),
+      ''
+    );
+
     const calldata = await depositCalldata(
       salt,
       Math.floor(amount).toString(),
       selected === DEPOSIT_OPTIONS.DAI ? '0' : '1'
     );
-    console.log(salt, Math.floor(amount).toString(), selected === DEPOSIT_OPTIONS.DAI ? '0' : '1');
-    console.log(calldata);
     if (!calldata) {
       return 'Invalid inputs to generate witness.';
     }
     console.log('calldata', calldata);
-    // try {
-    //   let result;
-    //   if (
-    //     dataAccount?.address &&
-    //     activeChain.id.toString() === networks.selectedChain
-    //   ) {
-    //     result = await contract.verifySudoku(
-    //       calldata.a,
-    //       calldata.b,
-    //       calldata.c,
-    //       calldata.Input
-    //     );
-    //   } else {
-    //     result = await contractNoSigner.verifySudoku(
-    //       calldata.a,
-    //       calldata.b,
-    //       calldata.c,
-    //       calldata.Input
-    //     );
-    //   }
-    //   console.log("result", result);
-    //   setLoadingVerifyBtn(false);
-    //   alert("Successfully verified");
-    // } catch (error) {
-    //   setLoadingVerifyBtn(false);
-    //   console.log(error);
-    //   alert("Wrong solution");
-    // }
+
+    setProofA(calldata.a);
+    setProofB(calldata.b);
+    setProofC(calldata.c);
+    setDepositInput(calldata.Input);
   };
+
+  const handleDepositContract = useCallback(async () => {
+    if (isDepositLoading) return;
+    if (!isConnected) {
+      connect();
+      return;
+    }
+    try {
+      const result = await depositAsync?.();
+      console.log('result', result);
+      alert('Successfully verified');
+    } catch (error) {
+      console.log(error);
+      alert('deposit verifying failed');
+    }
+  }, [connect, depositAsync, isConnected, isDepositLoading]);
+
+  useEffect(() => {
+    handleDepositContract();
+  }, [depositAsync, handleDepositContract, proofA, proofB, proofC, depositInput]);
 
   useEffect(() => {
     if (amount) {
