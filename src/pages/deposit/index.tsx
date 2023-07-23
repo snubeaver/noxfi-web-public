@@ -2,12 +2,14 @@ import { InjectedConnector } from '@wagmi/core';
 import { useWeb3Modal } from '@web3modal/react';
 import { useCallback, useEffect, useState } from 'react';
 import tw from 'twin.macro';
+import { useLocalStorage, useReadLocalStorage } from 'usehooks-ts';
 import { useConnect } from 'wagmi';
 
 import { ButtonLarge } from '~/components/buttons';
 import { Gnb } from '~/components/gnb';
 import { TextField } from '~/components/textfield';
 import { Toggle } from '~/components/toggle';
+import { LOCALSTORAGE_KEYS } from '~/constants';
 import { useTokenApprove } from '~/contract/approve';
 import { useContractDeposit } from '~/contract/deposit';
 import { useConnectWallet } from '~/hooks/data/use-connect-wallet';
@@ -15,6 +17,7 @@ import { useDepositState } from '~/states/data/deposit';
 import { DEPOSIT_OPTIONS } from '~/types';
 
 import { depositCalldata } from '../../zkproof/deposit/snarkjsDeposit';
+import { Balance } from '../my/types';
 
 const DepositPage = () => {
   const { isConnected } = useConnectWallet();
@@ -31,6 +34,12 @@ const DepositPage = () => {
   const [depositInput, setDepositInput] = useState<string[]>();
 
   const [amount, setAmount] = useState<number | string>('');
+
+  const currentBalance = useReadLocalStorage<Balance[]>(LOCALSTORAGE_KEYS.BALANCES);
+  const [balance, setBalance] = useLocalStorage<Balance[]>(
+    LOCALSTORAGE_KEYS.BALANCES,
+    currentBalance ?? []
+  );
 
   const { allowance, writeAsync: approveAsync, isLoading: isApproveLoading } = useTokenApprove();
 
@@ -99,10 +108,19 @@ const DepositPage = () => {
 
   useEffect(() => {
     if (data && data.hash) {
-      // {
-      //   hash: '0xbbb167f5d260654da1902bf10a58d5a4b33519b04589c94f96d288eec526e417';
-      // }
+      const addedBalance = balance.concat({
+        id: Date.now(),
+        note: data.hash,
+        noteHidden: true,
+        balance: {
+          amount: BigInt(amount),
+          decimalPoints: 18,
+          tokenTicker: selected,
+        },
+      });
+      setBalance(addedBalance);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   useEffect(() => {
