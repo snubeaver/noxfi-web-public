@@ -167,7 +167,20 @@ module.exports = {
         '.font-sb-20': { fontSize: '20px', lineHeight: '28px', fontWeight: 600 },
         '.font-sb-28': { fontSize: '28px', lineHeight: '38px', fontWeight: 600 },
       });
-      addUtilities({});
+      addUtilities({
+        '.scrollbar-hide': {
+          /* IE and Edge */
+          '-ms-overflow-style': 'none',
+
+          /* Firefox */
+          'scrollbar-width': 'none',
+
+          /* Safari and Chrome */
+          '&::-webkit-scrollbar': {
+            display: 'none',
+          },
+        },
+      });
     }),
   ],
 };

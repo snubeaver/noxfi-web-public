@@ -1,14 +1,19 @@
 import tw from 'twin.macro';
+import { useReadLocalStorage } from 'usehooks-ts';
 
 import { Gnb } from '~/components/gnb';
+import { LOCALSTORAGE_KEYS } from '~/constants';
 
 import { BalanceHeader } from './components/balance-header';
 import { BalanceRow } from './components/balance-row';
 import { OrderHeader } from './components/order-header';
 import { OrderRow } from './components/order-row';
-import { balances, orders } from './data';
+import { orders } from './data';
+import { Balance } from './types';
 
 const MyPage = () => {
+  const currentBalances = useReadLocalStorage<Balance[]>(LOCALSTORAGE_KEYS.BALANCES) ?? [];
+
   return (
     <Wrapper>
       <Gnb />
@@ -19,7 +24,7 @@ const MyPage = () => {
           <TableWrapper>
             <BalanceHeader />
             <Divider />
-            {balances.map(({ id, ...rest }) => (
+            {currentBalances.map(({ id, ...rest }) => (
               <BalanceRow key={id} {...rest} />
             ))}
           </TableWrapper>

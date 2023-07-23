@@ -16,7 +16,7 @@ export const BalanceRow = ({ note, noteHidden, balance, ...rest }: Props) => {
   const [shown, show] = useState(noteHidden);
   const toggle = () => show(!shown);
 
-  const parsedToken = Number(parseFloat(Number(formatEther(amount)), 4));
+  const parsedToken = Number(parseFloat(Number(formatEther(BigInt(amount))), 4));
   const parsedAmount =
     parsedToken > 1000000 ? parseNumberWithUnit(parsedToken) : parseNumberWithComma(parsedToken);
 
@@ -54,7 +54,7 @@ const NoteWrapper = tw.div`
   flex-center gap-4 flex-shrink-0 w-200
 `;
 const Note = tw.div`
-  flex font-r-14 text-white
+  flex font-r-14 text-white overflow-auto scrollbar-hide
 `;
 const HideWrapper = tw.div`
   flex-center flex-shrink-0 clickable
