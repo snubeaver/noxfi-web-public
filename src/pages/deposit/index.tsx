@@ -1,6 +1,6 @@
 import { InjectedConnector } from '@wagmi/core';
 import { useWeb3Modal } from '@web3modal/react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import tw from 'twin.macro';
 import { useConnect } from 'wagmi';
 
@@ -8,6 +8,7 @@ import { ButtonLarge } from '~/components/buttons';
 import { Gnb } from '~/components/gnb';
 import { TextField } from '~/components/textfield';
 import { Toggle } from '~/components/toggle';
+import { useAllowance, useTokenApprove } from '~/contract/approve';
 import { useContractDeposit } from '~/contract/deposit';
 import { useConnectWallet } from '~/hooks/data/use-connect-wallet';
 import { useDepositState } from '~/states/data/deposit';
@@ -26,6 +27,32 @@ const DepositPage = () => {
   const [proofB, setProofB] = useState<string[][]>();
   const [proofC, setProofC] = useState<string[]>();
   const [depositInput, setDepositInput] = useState<string[]>();
+
+  const {
+    allowanceAmount,
+    refetch: allowanceRefetch,
+    isFetching: isAllowanceLoading,
+  } = useAllowance();
+
+  const allowance = useMemo(
+    () => isConnected && allowanceAmount > 0,
+    [isConnected, allowanceAmount]
+  );
+
+  const {
+    writeAsync: approveAsync,
+    isLoading: isApproveLoading,
+    isSuccess: approveSuccess,
+  } = useTokenApprove();
+
+  const handleApprove = useCallback(async () => {
+    if (isApproveLoading) return;
+    if (!isConnected) {
+      connect();
+      return;
+    }
+    await approveAsync?.();
+  }, [approveAsync, connect, isApproveLoading, isConnected]);
 
   const { writeAsync: depositAsync, isLoading: isDepositLoading } = useContractDeposit({
     a: proofA,
@@ -54,7 +81,7 @@ const DepositPage = () => {
     const calldata = await depositCalldata(
       salt,
       Math.floor(Number(amount)).toString(),
-      selected === DEPOSIT_OPTIONS.DAI ? '0' : '1'
+      selected === DEPOSIT_OPTIONS.DAI ? '1' : '0'
     );
     if (!calldata) {
       return 'Invalid inputs to generate witness.';
@@ -90,6 +117,10 @@ const DepositPage = () => {
   const [amount, setAmount] = useState<number | string>('');
 
   useEffect(() => {
+    allowanceRefetch();
+  }, [approveSuccess, allowanceRefetch]);
+
+  useEffect(() => {
     setAmount('');
   }, [selected]);
 
@@ -119,7 +150,11 @@ const DepositPage = () => {
           />
         </DepositWrapper>
         {isConnected ? (
-          <ButtonLarge text="Deposit" onClick={handleDeposit} />
+          !allowance ? (
+            <ButtonLarge text="Deposit" onClick={handleDeposit} />
+          ) : (
+            <ButtonLarge text="Deposit" onClick={handleDeposit} />
+          )
         ) : (
           <ButtonLarge text="Connect Wallet" isLoading={isOpen} onClick={open} />
         )}

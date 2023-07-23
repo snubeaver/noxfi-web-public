@@ -195,7 +195,7 @@ export const noxfiABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: 'o',
+        name: 'oidx',
         type: 'uint256',
       },
       {

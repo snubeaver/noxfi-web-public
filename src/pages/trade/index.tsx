@@ -44,7 +44,7 @@ const TradePage = () => {
       setCalculatedAmount('');
       return;
     }
-    setCalculatedAmount(Number(parseFloat(amountNum * priceNum, 8)));
+    setCalculatedAmount(Number(parseFloat(amountNum * price, 8)));
   }, [amount, price]);
 
   useEffect(() => {
@@ -101,7 +101,12 @@ const TradePage = () => {
           </TradeInputWrapper>
         </TradeWrapper>
         {isConnected ? (
-          <ButtonLarge text="Trade" />
+          <ButtonLarge
+            text="Trade"
+            onClick={() => {
+              alert('Successfully submit order');
+            }}
+          />
         ) : (
           <ButtonLarge text="Connect Wallet" isLoading={isOpen} onClick={open} />
         )}
